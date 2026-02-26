@@ -20,8 +20,8 @@ jobs:
 
       - name: Build and Run Tests in Docker
         run: |
-          docker-compose build
-          docker-compose run backend python -m pytest --cov=app --cov-report=xml
+          docker compose build
+          docker compose run backend python -m pytest --cov=app --cov-report=xml
 
       # For sonarcloud integration, we can upload the coverage report as an artifact
       - name: Upload coverage report
