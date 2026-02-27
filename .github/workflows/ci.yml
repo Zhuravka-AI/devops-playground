@@ -16,10 +16,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Python
-        uses: actions/checkout@v4
-        # (Optional if you want to run tests without Docker for speed)
-
       - name: Build and Run Tests
         run: |
           docker compose build
