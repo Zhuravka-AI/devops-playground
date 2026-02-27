@@ -10,7 +10,7 @@ class TextData(BaseModel):
 def root():
     return {"status": "alive", "service": "backend"}
 
-@app.post("/analyze")
+@app.post("/analyze", responses={400: {"description": "Empty content provided"}})
 def analyze(data: TextData):
     if not data.content.strip():
         raise HTTPException(status_code=400, detail="Content cannot be empty")
