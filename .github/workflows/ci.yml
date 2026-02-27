@@ -24,11 +24,10 @@ jobs:
             -v $(pwd)/backend/coverage.xml:/app/coverage.xml \
             backend python -m pytest --cov=app --cov-report=xml:coverage.xml
 
-          sed -i 's|<source>.*</source>|<source>./backend/app</source>|g' backend/coverage.xml
+          sed -i 's|<source>.*</source>|<source>./</source>|g' backend/coverage.xml
           sed -i 's|filename="|filename="backend/app/|g' backend/coverage.xml
-
-          echo "--- CHECK XML AFTER SED ---"
-          head -n 25 backend/coverage.xml
+          echo "--- FINAL XML CHECK ---"
+          head -n 20 backend/coverage.xml
 
       # For sonarcloud integration, we can upload the coverage report as an artifact
 
