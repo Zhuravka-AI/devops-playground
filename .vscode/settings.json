@@ -1,0 +1,6 @@
+{
+    "sonarlint.connectedMode.project": {
+        "connectionId": "zhuravka-ai",
+        "projectKey": "Zhuravka-AI_devops-playground"
+    }
+}
