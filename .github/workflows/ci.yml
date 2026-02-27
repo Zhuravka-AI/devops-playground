@@ -27,7 +27,10 @@ jobs:
           docker compose run \
             -v $(pwd)/backend/coverage.xml:/app/coverage.xml \
             backend python -m pytest --cov=app --cov-report=xml:coverage.xml
+
           sed -i 's|<source>/app</source>|<source>./backend</source>|g' backend/coverage.xml
+          sed -i 's|filename="app/|filename="backend/app/|g' backend/coverage.xml
+          head -n 20 backend/coverage.xml
 
       # For sonarcloud integration, we can upload the coverage report as an artifact
 
