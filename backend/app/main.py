@@ -40,3 +40,7 @@ def analyze(data: TextData):
 def health():
     logger.info("Health check endpoint was called")
     return {"status": "ok"}
+
+@app.get("/debug-sentry")
+async def trigger_error():
+    division_by_zero = 1 / 0
