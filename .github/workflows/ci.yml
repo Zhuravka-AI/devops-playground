@@ -34,12 +34,9 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build and Run Frontend Tests
         run: |
-          docker build -t frontend-tests -f frontend/Dockerfile.test frontend/
+          docker compose build frontend-test
           mkdir -p frontend/coverage
-          chmod -R 777 frontend/coverage
-          docker run --rm \
-            -v $(pwd)/frontend/coverage:/app/coverage \
-            frontend-tests
+          docker compose run --rm frontend-test
       
       - name: Upload Frontend Coverage
         uses: actions/upload-artifact@v4
