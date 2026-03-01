@@ -39,7 +39,7 @@ jobs:
           chmod -R 777 frontend/coverage
           docker run --rm \
             -v $(pwd)/frontend/coverage:/app/coverage \
-            frontend-tests npx vitest run --coverage --clean=false
+            frontend-tests
       
       - name: Upload Frontend Coverage
         uses: actions/upload-artifact@v4
