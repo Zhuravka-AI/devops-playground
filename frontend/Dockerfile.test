@@ -3,4 +3,5 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
-CMD ["npm", "run", "coverage"]
+RUN mkdir -p coverage && chmod 777 coverage
+CMD ["sh", "-c", "rm -rf coverage/* && npx vitest run --coverage"]
