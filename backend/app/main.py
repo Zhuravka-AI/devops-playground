@@ -4,6 +4,7 @@ import sentry_sdk
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
+from fastapi.middleware.cors import CORSMiddleware
 
 # --- SENTRY SETTINGS ---
 sentry_sdk.init(
@@ -15,7 +16,14 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="DevOps Skills Demo API")
-app.add_middleware(SentryAsgiMiddleware)
+app.add_middleware(
+    SentryAsgiMiddleware,
+    CORSMiddleware,
+    allow_origins=["*"], # Поки що дозволяємо всім, пізніше обмежимо
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    )
 
 class TextData(BaseModel):
     content: str
