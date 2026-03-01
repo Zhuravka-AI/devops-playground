@@ -36,6 +36,7 @@ jobs:
         run: |
           docker build -t frontend-tests -f frontend/Dockerfile.test frontend/
           mkdir -p frontend/coverage
+          chmod -R 777 frontend/coverage
           docker run --rm \
             -v $(pwd)/frontend/coverage:/app/coverage \
             frontend-tests npx vitest run --coverage --clean=false
