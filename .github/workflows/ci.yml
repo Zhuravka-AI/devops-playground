@@ -19,7 +19,6 @@ jobs:
             -v $(pwd)/backend/coverage.xml:/app/coverage.xml \
             backend python -m pytest --cov=app --cov-report=xml:coverage.xml
           
-          # Фікси шляхів
           sed -i 's|<source>.*</source>|<source>./</source>|g' backend/coverage.xml
           sed -i 's|filename="|filename="backend/app/|g' backend/coverage.xml
       
@@ -35,14 +34,13 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build and Run Frontend Tests
         run: |
-          docker compose build frontend
-          mkdir -p frontend/coverage
-          touch frontend/coverage/lcov.info
+          # Білдимо образ для тестів
+          docker build -t frontend-tests -f frontend/Dockerfile.test frontend/
           
-          # Запускаємо тести через Docker
-          docker compose run \
+          mkdir -p frontend/coverage
+          docker run --rm \
             -v $(pwd)/frontend/coverage:/app/coverage \
-            frontend npm run coverage
+            frontend-tests
       
       - name: Upload Frontend Coverage
         uses: actions/upload-artifact@v4
@@ -51,14 +49,13 @@ jobs:
           path: frontend/coverage/lcov.info
 
   sonarcloud:
-    needs: [backend-test, frontend-test] # Чекаємо обидва тести
+    needs: [backend-test, frontend-test]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       
-      # Завантажуємо звіти з попередніх jobs
       - name: Download Backend Coverage
         uses: actions/download-artifact@v4
         with:
@@ -82,7 +79,7 @@ jobs:
 
   deploy:
     name: Deploy to Render
-    needs: [sonarcloud] # Деплоїмо тільки якщо аналіз успішний
+    needs: [sonarcloud]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     
