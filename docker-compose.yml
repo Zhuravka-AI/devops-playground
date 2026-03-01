@@ -10,12 +10,11 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-
-services:
+      
   frontend:
       build:
         context: ./frontend
-        dockerfile: Dockerfile
+        dockerfile: Dockerfile # Використовуємо продакшн-файл
       ports:
         - "80:80"
       depends_on:
