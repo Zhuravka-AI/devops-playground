@@ -7,45 +7,82 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
+  backend-test:
     runs-on: ubuntu-latest
-    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Build and Run Tests
+      - uses: actions/checkout@v4
+      - name: Build and Run Backend Tests
         run: |
-          docker compose build
+          docker compose build backend
           touch backend/coverage.xml
           docker compose run \
             -v $(pwd)/backend/coverage.xml:/app/coverage.xml \
             backend python -m pytest --cov=app --cov-report=xml:coverage.xml
-
+          
+          # Фікси шляхів
           sed -i 's|<source>.*</source>|<source>./</source>|g' backend/coverage.xml
           sed -i 's|filename="|filename="backend/app/|g' backend/coverage.xml
-          echo "--- FINAL XML CHECK ---"
-          head -n 20 backend/coverage.xml
+      
+      - name: Upload Backend Coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: backend/coverage.xml
 
-      # For sonarcloud integration, we can upload the coverage report as an artifact
+  frontend-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and Run Frontend Tests
+        run: |
+          docker compose build frontend
+          mkdir -p frontend/coverage
+          touch frontend/coverage/lcov.info
+          
+          # Запускаємо тести через Docker
+          docker compose run \
+            -v $(pwd)/frontend/coverage:/app/coverage \
+            frontend npm run coverage
+      
+      - name: Upload Frontend Coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: frontend/coverage/lcov.info
+
+  sonarcloud:
+    needs: [backend-test, frontend-test] # Чекаємо обидва тести
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      # Завантажуємо звіти з попередніх jobs
+      - name: Download Backend Coverage
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-coverage
+          path: backend
+      - name: Download Frontend Coverage
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-coverage
+          path: frontend/coverage
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarqube-scan-action@v3
+        uses: SonarSource/sonarqube-scan-action@v4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-      - name: Upload coverage report
-        uses: actions/upload-artifact@v4
         with:
-          name: coverage-report
-          path: backend/coverage.xml
+          args: >
+            -Dsonar.python.coverage.reportPaths=backend/coverage.xml
+            -Dsonar.javascript.lcov.reportPaths=frontend/coverage/lcov.info
 
   deploy:
     name: Deploy to Render
-    needs: test
+    needs: [sonarcloud] # Деплоїмо тільки якщо аналіз успішний
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     
