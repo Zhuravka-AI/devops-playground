@@ -16,14 +16,17 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="DevOps Skills Demo API")
+#  Register Sentry
+app.add_middleware(SentryAsgiMiddleware)
+
+# Register CORS (Separate call)
 app.add_middleware(
-    SentryAsgiMiddleware,
     CORSMiddleware,
-    allow_origins=["*"], # Поки що дозволяємо всім, пізніше обмежимо
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    )
+)
 
 class TextData(BaseModel):
     content: str
