@@ -34,7 +34,6 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build and Run Frontend Tests
         run: |
-          # Білдимо образ для тестів
           docker build -t frontend-tests -f frontend/Dockerfile.test frontend/
           
           mkdir -p frontend/coverage
