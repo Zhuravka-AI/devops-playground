@@ -21,7 +21,4 @@ services:
       context: ./frontend
       dockerfile: Dockerfile.test
     volumes:
-      - coverage_data:/app/coverage
-
-volumes:
-  coverage_data:
+      - ./frontend/coverage:/app/coverage

@@ -3,4 +3,5 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
-CMD ["sh", "-c", "rm -rf coverage/* && npx vitest run --coverage"]
+RUN mkdir -p /app/temp_coverage
+CMD ["sh", "-c", "npx vitest run --coverage --outputFile=/app/temp_coverage && cp -r /app/temp_coverage/* /app/coverage/"]

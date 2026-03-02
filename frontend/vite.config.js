@@ -10,7 +10,7 @@ export default defineConfig({
    setupFiles: './src/setupTests.js',
    coverage: {
       provider: 'v8',
-      reporter: ['text', 'json', 'lcov'], // Додаємо 'lcov' сюди
+      reporter: ['text', 'json', 'lcov'],
     }
   },
 })
