@@ -16,9 +16,3 @@ services:
         - "80:80"
       depends_on:
         - backend
-  frontend-test:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile.test
-    volumes:
-      - ./frontend/coverage:/app/coverage

@@ -1,7 +1,0 @@
-FROM node:20-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN mkdir -p /app/temp_coverage
-CMD ["sh", "-c", "npx vitest run --coverage --outputFile=/app/temp_coverage && cp -r /app/temp_coverage/* /app/coverage/"]
