@@ -125,7 +125,7 @@ jobs:
         run: curl -f ${{ secrets.RENDER_BACKEND_DEPLOY_HOOK }}
 
   deploy-frontend:
-    needs: [frontend-test, changes]
+    needs: [frontend-test, changes, sonarcloud]
     if: |
       always() && github.ref == 'refs/heads/main' && 
       needs.changes.outputs.frontend == 'true' &&
