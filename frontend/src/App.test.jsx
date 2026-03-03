@@ -7,5 +7,3 @@ test('renders DevOps Playground title', () => {
   const titleElement = screen.getByText(/DevOps Playground/i)
   expect(titleElement).toBeInTheDocument
 })
-
-// test message
