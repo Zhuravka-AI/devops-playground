@@ -40,3 +40,58 @@
 .read-the-docs {
   color: #888;
 }
+
+.result-container {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  border: 2px solid #646cff;
+  border-radius: 12px;
+  background-color: #1a1a1a;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  text-align: left;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.result-title {
+  margin-top: 0;
+  color: #646cff;
+  border-bottom: 1px solid #333;
+  padding-bottom: 0.5rem;
+}
+
+.result-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.result-item {
+  display: flex;
+  justify-content: space-between;
+}
+
+.label {
+  color: #888;
+  font-weight: 500;
+}
+
+.value {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: bold;
+}
+
+.status-warning { color: #ff4d4d; }
+.status-success { color: #4dff88; }
+
+textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  background: #242424;
+  color: white;
+  border: 1px solid #444;
+}
