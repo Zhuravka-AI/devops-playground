@@ -18,3 +18,5 @@ def test_analyze_empty_text():
     response = client.post("/analyze", json={"content": "   "})
     assert response.status_code == 400
     assert response.json()["detail"] == "Content cannot be empty"
+    
+# test message to trigger pipeline
