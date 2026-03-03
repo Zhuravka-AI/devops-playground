@@ -24,6 +24,7 @@ jobs:
             frontend:
               - 'frontend/**'
               - 'docker-compose.yml'
+
   backend-test:
     needs: changes
     if: ${{ needs.changes.outputs.backend == 'true' }}
@@ -46,6 +47,16 @@ jobs:
         with:
           name: backend-coverage
           path: backend/coverage.xml
+
+      - name: SonarCloud Scan (Backend)
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.sources=backend/app
+            -Dsonar.python.coverage.reportPaths=backend/coverage.xml
 
   frontend-test:
     needs: changes
@@ -72,37 +83,18 @@ jobs:
           name: frontend-coverage
           path: frontend/coverage/lcov.info
 
-  sonarcloud:
-    needs: [frontend-test, backend-test]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      
-      - name: Download Backend Coverage
-        uses: actions/download-artifact@v4
-        with:
-          name: backend-coverage
-          path: backend
-      - name: Download Frontend Coverage
-        uses: actions/download-artifact@v4
-        with:
-          name: frontend-coverage
-          path: frontend/coverage
-
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarqube-scan-action@v6
+      - name: SonarCloud Scan (Frontend)
+        uses: SonarSource/sonarqube-scan-action@v5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-            -Dsonar.python.coverage.reportPaths=backend/coverage.xml
+            -Dsonar.sources=frontend/src
             -Dsonar.javascript.lcov.reportPaths=frontend/coverage/lcov.info
 
   deploy-backend:
-    needs: [backend-test, changes, sonarcloud]
+    needs: [backend-test, changes]
     if: |
       always() && github.ref == 'refs/heads/main' && 
       needs.changes.outputs.backend == 'true' &&
@@ -125,7 +117,7 @@ jobs:
         run: curl -f ${{ secrets.RENDER_BACKEND_DEPLOY_HOOK }}
 
   deploy-frontend:
-    needs: [frontend-test, changes, sonarcloud]
+    needs: [frontend-test, changes]
     if: |
       always() && github.ref == 'refs/heads/main' && 
       needs.changes.outputs.frontend == 'true' &&
