@@ -6,6 +6,9 @@ describe('App Component', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     global.fetch = vi.fn()
+    if (!window.alert) {
+      window.alert = vi.fn()
+    }
   })
 
   it('renders the app title', () => {
