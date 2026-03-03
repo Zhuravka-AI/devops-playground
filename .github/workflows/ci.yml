@@ -73,7 +73,7 @@ jobs:
           path: frontend/coverage/lcov.info
 
   sonarcloud:
-    needs: [backend-test, frontend-test]
+    needs: [frontend-test, backend-test]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -144,5 +144,7 @@ jobs:
           context: ./frontend
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/project-frontend:latest
+          build-args: |
+            VITE_API_URL=https://project-backend-latest-jtvw.onrender.com
       - name: Trigger Render Frontend
         run: curl -f ${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK }}
