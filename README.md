@@ -8,6 +8,13 @@ This project is a live demonstration of a modern **Software Development Life Cyc
 
 ---
 
+## 🚀 Live Demo
+
+* **Frontend (UI):** [https://project-frontend-latest-3oj0.onrender.com](https://project-frontend-latest-3oj0.onrender.com)
+* **Backend (API Docs):** [https://project-backend-latest-jtvw.onrender.com/docs](https://project-backend-latest-jtvw.onrender.com/docs)
+
+---
+
 ## 🛠 Technical Stack
 
 * **Frontend:** React (Vite), Vitest, CSS3
