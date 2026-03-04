@@ -25,17 +25,31 @@ The following diagram illustrates the interaction between services and the integ
 
 ```mermaid
 graph TD
-    User((User Browser)) -->|React + Vite| FE[Frontend Container]
-    FE -->|API Requests| BE[Backend Container - FastAPI]
-    BE -->|Error Logging| Sentry[Sentry.io]
-    FE -->|Error Logging| Sentry
+    User((User Browser)) -->|React + Vite| FE_App[Frontend Container]
+    FE_App -->|API Requests| BE_App[Backend Container - FastAPI]
+    BE_App -->|Error Monitoring| Sentry[Sentry.io]
+    FE_App -->|Error Monitoring| Sentry
     
-    subgraph CI/CD Pipeline
-        GH[GitHub Actions] -->|Filter Paths| Tests{Run Tests?}
-        Tests -->|Yes| SC[SonarCloud Analysis]
-        SC -->|Quality Gate Pass| Build[Docker Build & Push]
-        Build -->|Webhook| Render[Render Deployment]
+    subgraph CI/CD_Pipeline
+        GH[GitHub Actions] -->|paths-filter| Filter{Detected Changes?}
+        
+        %% Backend Branch
+        Filter -->|backend/**| BE_Test[backend-test]
+        BE_Test --> BE_Sonar[SonarCloud Scan BE]
+        BE_Sonar --> BE_Push[Docker Hub Push BE]
+        BE_Push --> BE_Render[Render Deploy BE]
+        
+        %% Frontend Branch
+        Filter -->|frontend/**| FE_Test[frontend-test]
+        FE_Test --> FE_Sonar[SonarCloud Scan FE]
+        FE_Sonar --> FE_Push[Docker Hub Push FE]
+        FE_Push --> FE_Render[Render Deploy FE]
     end
+
+    %% Visual styling
+    style BE_Render fill:#f96,stroke:#333
+    style FE_Render fill:#f96,stroke:#333
+    style Sentry fill:#6e40aa,color:#fff
 ```
 
 ---
