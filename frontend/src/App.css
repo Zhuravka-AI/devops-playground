@@ -46,7 +46,7 @@
   padding: 1.5rem;
   border: 2px solid #646cff;
   border-radius: 12px;
-  background-color: #1a1a1a;
+  background-color: #7cb3c0;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   text-align: left;
   max-width: 400px;
@@ -74,7 +74,7 @@
 }
 
 .label {
-  color: #888;
+  color: #7d78ff;
   font-weight: 500;
 }
 
@@ -93,5 +93,5 @@ textarea {
   border-radius: 8px;
   background: #242424;
   color: white;
-  border: 1px solid #444;
+  border: 1px solid #273277;
 }
