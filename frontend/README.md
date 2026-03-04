@@ -1,16 +1,93 @@
-# React + Vite
+# 🚀 DevOps Playground: Fullstack CI/CD Case Study
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![Build Status](https://github.com/Zhuravka-AI/devops-playground/actions/workflows/ci.yml/badge.svg)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Zhuravka-AI_devops-playground&metric=alert_status&token=c6b6f0f57088e823da4189a4c3ca3b0495f8428b)](https://sonarcloud.io/summary/new_code?id=Zhuravka-AI_devops-playground)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Zhuravka-AI_devops-playground&metric=coverage&token=c6b6f0f57088e823da4189a4c3ca3b0495f8428b)](https://sonarcloud.io/summary/new_code?id=Zhuravka-AI_devops-playground)
 
-Currently, two official plugins are available:
+This project is a live demonstration of a modern **Software Development Life Cycle (SDLC)**. It features a Monorepo architecture with a FastAPI backend and React frontend, governed by a rigorous CI/CD pipeline.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## 🛠 Technical Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+* **Frontend:** React (Vite), Vitest, CSS3
+* **Backend:** Python (FastAPI), Pytest, Docker
+* **CI/CD:** GitHub Actions (Path-based filtering)
+* **Analysis:** SonarCloud (Static Analysis & Coverage)
+* **Monitoring:** Sentry (Real-time Error Tracking)
+* **Hosting:** Render (Cloud PaaS)
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🏗 System Architecture
+
+The following diagram illustrates the interaction between services and the integrated monitoring layer:
+
+```mermaid
+graph TD
+    User((User Browser)) -->|React + Vite| FE[Frontend Container]
+    FE -->|API Requests| BE[Backend Container - FastAPI]
+    BE -->|Error Logging| Sentry[Sentry.io]
+    FE -->|Error Logging| Sentry
+    
+    subgraph CI/CD Pipeline
+        GH[GitHub Actions] -->|Filter Paths| Tests{Run Tests?}
+        Tests -->|Yes| SC[SonarCloud Analysis]
+        SC -->|Quality Gate Pass| Build[Docker Build & Push]
+        Build -->|Webhook| Render[Render Deployment]
+    end
+```
+
+---
+
+## ⚙️ CI/CD Pipeline Logic
+
+The pipeline is optimized for speed and resource efficiency:
+
+* **Selective Execution:** Uses `dorny/paths-filter`. If you only change Frontend code, the Backend tests and deployment are skipped.
+* **Automated Quality Gate:** Deployment to production (`main` branch) is blocked if SonarCloud detects security vulnerabilities or if test coverage drops below the threshold.
+* **Dockerized Builds:** Both services are containerized to ensure "it works on my machine" consistency in the cloud.
+* **Traceability:** Every deployment is linked to a specific GitHub SHA and linked to Issues/PRs for full transparency.
+
+---
+
+## 📊 Monitoring & Quality
+
+Keep track of the project's health and performance through these live dashboards:
+
+* **🌐 Live Demo:** [View Website](https://project-frontend-latest.onrender.com)
+* **🔍 SonarCloud Dashboard:** [Code Analysis Report](https://sonarcloud.io/dashboard?id=YOUR_PROJECT_KEY)
+* **🛠 Sentry.io:** [Error Tracking Dashboard](https://sentry.io/organizations/your-org/projects/your-project/)
+
+---
+
+## 📦 Local Development
+
+### Prerequisites
+
+* Docker & Docker Compose
+
+### Fast Start
+
+```bash
+# Clone the repository
+git clone [https://github.com/YOUR_USERNAME/YOUR_REPO.git](https://github.com/YOUR_USERNAME/YOUR_REPO.git)
+
+# Start the entire stack
+docker-compose up --build
+```
+
+* **Frontend:** [http://localhost:80](http://localhost:80)
+* **Backend:** [http://localhost:8000](http://localhost:8000)
+
+---
+
+## 📝 Project Management
+
+This project follows a strict **Branching Strategy**:
+
+* **main** - Production-ready code.
+* **develop** - Integration branch for features.
+* **feature/#-name** - Individual tasks linked to GitHub Issues.
+
+*Example: Pull Requests containing "Closes #12" will automatically link and close the corresponding task upon merge.*
