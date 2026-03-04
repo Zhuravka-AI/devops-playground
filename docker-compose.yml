@@ -9,10 +9,10 @@ services:
       timeout: 10s
       retries: 3     
   frontend:
-      build:
-        context: ./frontend
-        dockerfile: Dockerfile # Використовуємо продакшн-файл
-      ports:
-        - "80:80"
-      depends_on:
-        - backend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=http://localhost:8000
+    ports:
+      - "80:80"
