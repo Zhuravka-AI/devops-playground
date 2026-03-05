@@ -141,5 +141,6 @@ jobs:
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/project-frontend:latest
           build-args: |
             VITE_API_URL=https://project-backend-latest-jtvw.onrender.com
+            VITE_SENTRY_DSN=${{ secrets.VITE_SENTRY_DSN }}
       - name: Trigger Render Frontend
         run: curl -f ${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK }}
