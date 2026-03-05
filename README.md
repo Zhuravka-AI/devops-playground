@@ -10,8 +10,13 @@ This project is a live demonstration of a modern **Software Development Life Cyc
 
 ## 🚀 Live Demo
 
-* **Frontend (UI):** [https://project-frontend-latest-3oj0.onrender.com](https://project-frontend-latest-3oj0.onrender.com)
-* **Backend (API Docs):** [https://project-backend-latest-jtvw.onrender.com/docs](https://project-backend-latest-jtvw.onrender.com/docs)
+* **🌐 Frontend (UI):** [View Website](https://project-frontend-latest-3oj0.onrender.com)
+* **🌐 Backend (API Docs):** [View API Docs (Swagger)](https://project-backend-latest-jtvw.onrender.com/docs)
+
+> **Note:** The project uses a free hosting tier. The server may take **up to 50 seconds** to "wake up" during the first request after inactivity. Thank you for your patience!
+
+[!IMPORTANT]
+The backend is hosted on a free instance. If the app seems unresponsive, please wait ~50 seconds for the server to spin up.
 
 ---
 
@@ -80,8 +85,7 @@ The pipeline is optimized for speed and resource efficiency:
 
 Keep track of the project's health and performance through these live dashboards:
 
-* **🌐 Live Demo:** [View Website](https://project-frontend-latest.onrender.com)
-* **🔍 SonarCloud Dashboard:** [Code Analysis Report](https://sonarcloud.io/dashboard?id=YOUR_PROJECT_KEY)
+* **🔍 SonarCloud Dashboard:** [Code Analysis Report](https://sonarcloud.io/dashboard?id=Zhuravka-AI_devops-playground)
 * **🛠 Sentry.io:** [Error Tracking Dashboard](https://sentry.io/organizations/your-org/projects/your-project/)
 
 ---
@@ -95,10 +99,8 @@ Keep track of the project's health and performance through these live dashboards
 ### Fast Start
 
 ```bash
-# Clone the repository
-git clone [https://github.com/YOUR_USERNAME/YOUR_REPO.git](https://github.com/YOUR_USERNAME/YOUR_REPO.git)
-
-# Start the entire stack
+git clone https://github.com/Zhuravka-AI/devops-playground.git
+cd devops-playground
 docker-compose up --build
 ```
 
