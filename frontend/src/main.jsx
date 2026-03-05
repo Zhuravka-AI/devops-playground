@@ -1,10 +1,29 @@
-import { StrictMode } from 'react'
+import React, { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
+import * as Sentry from "@sentry/react";
 
-createRoot(document.getElementById('root')).render(
+Sentry.init({
+  dsn: import.meta.env.VITE_SENTRY_DSN,
+  integrations: [
+    Sentry.browserTracingIntegration(),
+    Sentry.replayIntegration(),
+  ],
+
+  tracesSampleRate: 1.0, 
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1.0,
+  sendDefaultPii: true
+});
+
+const container = document.getElementById("root");
+const root = createRoot(container);
+
+root.render(
   <StrictMode>
-    <App />
-  </StrictMode>,
-)
+    <Sentry.ErrorBoundary fallback={<p>Something went wrong. The team has been notified.</p>}>
+      <App />
+    </Sentry.ErrorBoundary>
+  </StrictMode>
+);

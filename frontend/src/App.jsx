@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './App.css'
+import SentryTest from './components/SentryTest';
 
 function App() {
   const [text, setText] = useState('')
@@ -61,6 +62,7 @@ function App() {
           </div>
         </div>
       )}
+      <SentryTest />
     </div>
   )
 }
