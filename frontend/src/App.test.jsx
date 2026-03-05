@@ -1,3 +1,4 @@
+// filepath: /Users/andrii/dev/devops-playground/frontend/src/App.test.jsx
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import App from './App'
@@ -5,9 +6,9 @@ import App from './App'
 describe('App Component', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    global.fetch = vi.fn()
-    if (!window.alert) {
-      window.alert = vi.fn()
+    globalThis.fetch = vi.fn()
+    if (!globalThis.alert) {
+      globalThis.alert = vi.fn()
     }
   })
 
@@ -31,7 +32,7 @@ describe('App Component', () => {
 
   it('disables button when text is empty', () => {
     render(<App />)
-    const button = screen.getByRole('button')
+    const button = screen.getByRole('button', { name: /analyze/i })
     expect(button).toBeDisabled()
   })
 
@@ -39,30 +40,30 @@ describe('App Component', () => {
     render(<App />)
     const textarea = screen.getByPlaceholderText('Enter your text for analysis...')
     fireEvent.change(textarea, { target: { value: 'test' } })
-    const button = screen.getByRole('button')
+    const button = screen.getByRole('button', { name: /analyze/i })
     expect(button).not.toBeDisabled()
   })
 
   it('shows loading state during API call', async () => {
-    global.fetch.mockResolvedValueOnce({
+    globalThis.fetch.mockResolvedValueOnce({
       json: async () => ({ length: 4, words: 1, is_long: false })
     })
     render(<App />)
     const textarea = screen.getByPlaceholderText('Enter your text for analysis...')
     fireEvent.change(textarea, { target: { value: 'test' } })
-    fireEvent.click(screen.getByRole('button'))
+    fireEvent.click(screen.getByRole('button', { name: /analyze/i }))
     expect(screen.getByText('Analyzing...')).toBeInTheDocument()
   })
 
   it('displays analysis results on successful API call', async () => {
-    global.fetch.mockResolvedValueOnce({
+    globalThis.fetch.mockResolvedValueOnce({
       json: async () => ({ length: 50, words: 10, is_long: false })
     })
     render(<App />)
     fireEvent.change(screen.getByPlaceholderText('Enter your text for analysis...'), {
       target: { value: 'test content' }
     })
-    fireEvent.click(screen.getByRole('button'))
+    fireEvent.click(screen.getByRole('button', { name: /analyze/i }))
     await waitFor(() => {
       expect(screen.getByText('50')).toBeInTheDocument()
       expect(screen.getByText('10')).toBeInTheDocument()
@@ -71,43 +72,43 @@ describe('App Component', () => {
   })
 
   it('displays YES for long content', async () => {
-    global.fetch.mockResolvedValueOnce({
+    globalThis.fetch.mockResolvedValueOnce({
       json: async () => ({ length: 5000, words: 800, is_long: true })
     })
     render(<App />)
     fireEvent.change(screen.getByPlaceholderText('Enter your text for analysis...'), {
       target: { value: 'x'.repeat(5000) }
     })
-    fireEvent.click(screen.getByRole('button'))
+    fireEvent.click(screen.getByRole('button', { name: /analyze/i }))
     await waitFor(() => {
       expect(screen.getByText('YES')).toBeInTheDocument()
     })
   })
 
   it('handles API errors gracefully', async () => {
-    global.fetch.mockRejectedValueOnce(new Error('Network error'))
-    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {})
+    globalThis.fetch.mockRejectedValueOnce(new Error('Network error'))
+    const alertSpy = vi.spyOn(globalThis, 'alert').mockImplementation(() => {})
     render(<App />)
     fireEvent.change(screen.getByPlaceholderText('Enter your text for analysis...'), {
       target: { value: 'test' }
     })
-    fireEvent.click(screen.getByRole('button'))
+    fireEvent.click(screen.getByRole('button', { name: /analyze/i }))
     await waitFor(() => {
       expect(alertSpy).toHaveBeenCalledWith('API is not responding')
     })
   })
 
   it('sends correct payload to API', async () => {
-    global.fetch.mockResolvedValueOnce({
+    globalThis.fetch.mockResolvedValueOnce({
       json: async () => ({ length: 4, words: 1, is_long: false })
     })
     render(<App />)
     fireEvent.change(screen.getByPlaceholderText('Enter your text for analysis...'), {
       target: { value: 'test' }
     })
-    fireEvent.click(screen.getByRole('button'))
+    fireEvent.click(screen.getByRole('button', { name: /analyze/i }))
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith(
+      expect(globalThis.fetch).toHaveBeenCalledWith(
         expect.stringContaining('/analyze'),
         expect.objectContaining({
           method: 'POST',
