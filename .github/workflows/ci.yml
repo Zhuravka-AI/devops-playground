@@ -115,7 +115,7 @@ jobs:
           path: frontend/coverage/lcov.info
 
       - name: SonarCloud Scan (Frontend)
-        uses: SonarSource/sonarqube-scan-action@6
+        uses: SonarSource/sonarqube-scan-action@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
