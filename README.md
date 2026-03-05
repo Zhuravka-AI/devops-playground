@@ -15,8 +15,8 @@ This project is a live demonstration of a modern **Software Development Life Cyc
 
 > **Note:** The project uses a free hosting tier. The server may take **up to 50 seconds** to "wake up" during the first request after inactivity. Thank you for your patience!
 
-[!IMPORTANT]
-The backend is hosted on a free instance. If the app seems unresponsive, please wait ~50 seconds for the server to spin up.
+> [!IMPORTANT]
+> The backend is hosted on a free instance. If the app seems unresponsive, please wait ~50 seconds for the server to spin up.
 
 ---
 
