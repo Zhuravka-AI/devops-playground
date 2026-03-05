@@ -55,6 +55,3 @@ def health():
 @app.get("/debug-sentry")
 async def trigger_error():
     division_by_zero = 1 / 0
-    
-    
-# test comment

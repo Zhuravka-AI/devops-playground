@@ -9,9 +9,9 @@ def test_root_endpoint():
     assert response.json()["status"] == "alive"
 
 def test_analyze_valid_text():
-    response = client.post("/analyze", json={"content": "Hello DevOps world"})
+    response = client.post("/analyze", json={"content": "Hello  DevOps world"})
     assert response.status_code == 200
-    assert response.json()["length"] == 18
+    assert response.json()["length"] == 19
     assert response.json()["words"] == 3
 
 def test_analyze_empty_text():
