@@ -3,6 +3,9 @@
 ![Build Status](https://github.com/Zhuravka-AI/devops-playground/actions/workflows/ci.yml/badge.svg)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Zhuravka-AI_devops-playground&metric=alert_status&token=c6b6f0f57088e823da4189a4c3ca3b0495f8428b)](https://sonarcloud.io/summary/new_code?id=Zhuravka-AI_devops-playground)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Zhuravka-AI_devops-playground&metric=coverage&token=c6b6f0f57088e823da4189a4c3ca3b0495f8428b)](https://sonarcloud.io/summary/new_code?id=Zhuravka-AI_devops-playground)
+![Sentry Frontend](https://img.shields.io/badge/Sentry-Frontend-440154?style=flat-square&logo=sentry)
+![Sentry Backend](https://img.shields.io/badge/Sentry-Backend-440154?style=flat-square&logo=sentry)
+
 
 This project is a live demonstration of a modern **Software Development Life Cycle (SDLC)**. It features a Monorepo architecture with a FastAPI backend and React frontend, governed by a rigorous CI/CD pipeline.
 
@@ -84,7 +87,7 @@ The pipeline is optimized for speed and resource efficiency:
 Keep track of the project's health and performance through these live dashboards:
 
 * **🔍 SonarCloud Dashboard:** [Code Analysis Report](https://sonarcloud.io/dashboard?id=Zhuravka-AI_devops-playground)
-* **🛠 Sentry.io:** [Error Tracking Dashboard](https://sentry.io/organizations/your-org/projects/your-project/)
+* **🛠 Sentry.io:** [Error Tracking Dashboard](https://zhuravka-ai-es.sentry.io/dashboard/default-overview/)
 
 ---
 
