@@ -13,10 +13,8 @@ This project is a live demonstration of a modern **Software Development Life Cyc
 * **🌐 Frontend (UI):** [View Website](https://project-frontend-latest-3oj0.onrender.com)
 * **🌐 Backend (API Docs):** [View API Docs (Swagger)](https://project-backend-latest-jtvw.onrender.com/docs)
 
-> **Note:** The project uses a free hosting tier. The server may take **up to 50 seconds** to "wake up" during the first request after inactivity. Thank you for your patience!
-
 > [!IMPORTANT]
-> The backend is hosted on a free instance. If the app seems unresponsive, please wait ~50 seconds for the server to spin up.
+> **Note:** The project uses a free hosting tier. The server may take **up to 50 seconds** to "wake up" during the first request after inactivity. Thank you for your patience!
 
 ---
 
