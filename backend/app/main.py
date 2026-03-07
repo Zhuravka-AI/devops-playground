@@ -53,5 +53,8 @@ def health():
     return {"status": "ok"}
 
 @app.get("/debug-sentry")
+# This endpoint is used to trigger a test error for Sentry integration verification
 async def trigger_error():
     division_by_zero = 1 / 0
+    
+ 
