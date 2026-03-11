@@ -17,7 +17,7 @@ describe('App Component', () => {
     expect(screen.getByText('DevOps Playground')).toBeInTheDocument()
   })
 
-  it('renders textarea with placeholder', () => {
+  it('renders textarea with placeholder.', () => {
     render(<App />)
     const textarea = screen.getByPlaceholderText('Enter your text for analysis...')
     expect(textarea).toBeInTheDocument()
