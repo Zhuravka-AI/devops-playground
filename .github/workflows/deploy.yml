@@ -1,6 +1,9 @@
 name: Deploy to AWS
 
 on:
+  push:
+    branches:
+      - '27-migrate-to-aws'
   workflow_run:
     workflows: ["CI Pipeline"] 
     types:
