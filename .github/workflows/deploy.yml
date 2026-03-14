@@ -80,7 +80,7 @@ jobs:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "docker-compose.yml" 
+          source: "docker-compose.yml, nginx/nginx.conf" 
           target: "~/app"
 
       - name: Deploy to AWS
