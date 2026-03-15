@@ -24,7 +24,7 @@ def test_db_check_success(monkeypatch):
     def fake_connect(dsn):
         return MagicMock()
 
-    with patch("backend.app.main.psycopg2.connect", side_effect=fake_connect) as mock_connect:
+    with patch("app.main.psycopg2.connect", side_effect=fake_connect) as mock_connect:
         monkeypatch.setenv("DATABASE_URL", "postgresql://user:pass@localhost:5432/db")
         response = client.get("/db-check")
 
@@ -34,7 +34,7 @@ def test_db_check_success(monkeypatch):
 
 
 def test_db_check_failure(monkeypatch):
-    with patch("backend.app.main.psycopg2.connect", side_effect=Exception("connection failed")) as mock_connect:
+    with patch("app.main.psycopg2.connect", side_effect=Exception("connection failed")) as mock_connect:
         monkeypatch.setenv("DATABASE_URL", "postgresql://user:pass@localhost:5432/db")
         response = client.get("/db-check")
 
