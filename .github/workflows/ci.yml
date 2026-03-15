@@ -2,10 +2,11 @@ name: CI Pipeline
 
 on:
   push:
-    branches:
-      - '**'
-  pull_request:
     branches: [ main ]
+  pull_request:
+    branches:
+      - main
+      - 'release/**'
 
 jobs:
   changes:
