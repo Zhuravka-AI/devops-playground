@@ -1,6 +1,7 @@
 import logging
 import os
 import sentry_sdk
+import psycopg2
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
@@ -15,7 +16,10 @@ sentry_sdk.init(
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="DevOps Skills Demo API")
+app = FastAPI(
+    title="DevOps Skills Demo API",
+    root_path="/api"
+    )
 #  Register Sentry
 app.add_middleware(SentryAsgiMiddleware)
 
@@ -52,6 +56,17 @@ def health():
     logger.info("Health check endpoint was called")
     return {"status": "ok"}
 
+@app.get("/db-check")
+def check_db():
+    try:
+        conn = psycopg2.connect(os.getenv("DATABASE_URL"))
+        conn.close()
+        return {"status": "connected to RDS"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
 @app.get("/debug-sentry")
 async def trigger_error():
+    # sonar:off
     division_by_zero = 1 / 0
+    # sonar:on

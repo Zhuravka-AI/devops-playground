@@ -11,13 +11,10 @@ This project is a live demonstration of a modern **Software Development Life Cyc
 
 ---
 
-## 🚀 Live Demo
+## 🚀 Live Access
 
-* **🌐 Frontend (UI):** [View Website](https://project-frontend-latest-3oj0.onrender.com)
-* **🌐 Backend (API Docs):** [View API Docs (Swagger)](https://project-backend-latest-jtvw.onrender.com/docs)
-
-> [!IMPORTANT]
-> **Note:** The project uses a free hosting tier. The server may take **up to 50 seconds** to "wake up" during the first request after inactivity. Thank you for your patience!
+* **🌐 Main Application:** [http://ec2-51-21-45-71.eu-north-1.compute.amazonaws.com/](http://ec2-51-21-45-71.eu-north-1.compute.amazonaws.com/)
+* **🌐 API Documentation:** [http://ec2-51-21-45-71.eu-north-1.compute.amazonaws.com/api/docs](http://ec2-51-21-45-71.eu-north-1.compute.amazonaws.com/api/docs)
 
 ---
 
@@ -25,10 +22,11 @@ This project is a live demonstration of a modern **Software Development Life Cyc
 
 * **Frontend:** React (Vite), Vitest, CSS3
 * **Backend:** Python (FastAPI), Pytest, Docker
-* **CI/CD:** GitHub Actions (Path-based filtering)
+* **Infrastructure:** AWS EC2 (t3.micro), Static Elastic IP (51.21.45.71)
+* **Orchestration:** Docker Compose
+* **CI/CD:** GitHub Actions (Path-based filtering) + Docker Hub + SSH Deploy
 * **Analysis:** SonarCloud (Static Analysis & Coverage)
 * **Monitoring:** Sentry (Real-time Error Tracking)
-* **Hosting:** Render (Cloud PaaS)
 
 ---
 
