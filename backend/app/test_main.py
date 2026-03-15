@@ -1,5 +1,6 @@
 from fastapi.testclient import TestClient
-from .main import app
+from unittest.mock import patch, MagicMock
+from app.main import app
 
 client = TestClient(app)
 
@@ -18,3 +19,38 @@ def test_analyze_empty_text():
     response = client.post("/analyze", json={"content": "   "})
     assert response.status_code == 400
     assert response.json()["detail"] == "Content cannot be empty"
+
+def test_db_check_success(monkeypatch):
+    def fake_connect(dsn):
+        return MagicMock()
+
+    with patch("backend.app.main.psycopg2.connect", side_effect=fake_connect) as mock_connect:
+        monkeypatch.setenv("DATABASE_URL", "postgresql://user:pass@localhost:5432/db")
+        response = client.get("/db-check")
+
+    mock_connect.assert_called_once()
+    assert response.status_code == 200
+    assert response.json() == {"status": "connected to RDS"}
+
+
+def test_db_check_failure(monkeypatch):
+    with patch("backend.app.main.psycopg2.connect", side_effect=Exception("connection failed")) as mock_connect:
+        monkeypatch.setenv("DATABASE_URL", "postgresql://user:pass@localhost:5432/db")
+        response = client.get("/db-check")
+
+    mock_connect.assert_called_once()
+    assert response.status_code == 200
+    assert response.json()["status"] == "error"
+    assert "connection failed" in response.json()["message"]
+
+
+def test_health_endpoint():
+    response = client.get("/health")
+    assert response.status_code == 200
+    assert response.json() == {"status": "ok"}
+
+
+def test_debug_sentry_endpoint():
+    response = client.get("/debug-sentry")
+    # The endpoint intentionally raises an error; FastAPI returns 500
+    assert response.status_code == 500

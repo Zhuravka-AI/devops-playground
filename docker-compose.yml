@@ -1,6 +1,8 @@
 services:
   backend:
     build: ./backend
+    volumes:
+      - ./backend:/app
     image: ${DOCKERHUB_USERNAME:-devops-playground}/project-backend:latest
     restart: always
     environment:
