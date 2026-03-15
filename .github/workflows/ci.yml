@@ -48,6 +48,7 @@ jobs:
       - name: Run Backend Tests
         run: |
           rm -f backend/coverage.xml
+          touch backend/coverage.xml
           docker run --rm \
             -v $(pwd)/backend/coverage.xml:/app/coverage.xml \
             backend-test:latest python -m pytest --cov=app --cov-report=xml:coverage.xml
