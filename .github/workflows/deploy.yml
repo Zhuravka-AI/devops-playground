@@ -1,9 +1,6 @@
 name: Deploy to AWS
 
 on:
-  push:
-    branches:
-      - '27-migrate-to-aws'
   workflow_run:
     workflows: ["CI Pipeline"] 
     types:
@@ -12,8 +9,7 @@ on:
 jobs:
   on-success:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }} 
-    # return condition after tests: && github.ref == 'refs/heads/main'
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.ref == 'refs/heads/main'}} 
     steps:
       - name: Start Deployment
         run: echo "CI passed, starting deployment..."
