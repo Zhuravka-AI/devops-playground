@@ -51,7 +51,7 @@ jobs:
           touch backend/coverage.xml
           docker run --rm \
             -v $(pwd)/backend/coverage.xml:/app/coverage.xml \
-            backend-test:latest python -m pytest --cov=app --cov-report=xml:coverage.xml
+            backend-test:latest pytest --cov=app --cov-report=xml:/app/coverage.xml
       - name: SonarCloud Scan (Backend)
         uses: SonarSource/sonarqube-scan-action@v6
         env:
