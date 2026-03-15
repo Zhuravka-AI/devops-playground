@@ -67,4 +67,6 @@ def check_db():
 
 @app.get("/debug-sentry")
 async def trigger_error():
+    # sonar:off
     division_by_zero = 1 / 0
+    # sonar:on

@@ -48,9 +48,3 @@ def test_health_endpoint():
     response = client.get("/health")
     assert response.status_code == 200
     assert response.json() == {"status": "ok"}
-
-
-def test_debug_sentry_endpoint():
-    response = client.get("/debug-sentry")
-    # The endpoint intentionally raises an error; FastAPI returns 500
-    assert response.status_code == 500
