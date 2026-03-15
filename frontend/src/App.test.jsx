@@ -12,7 +12,7 @@ describe('App Component', () => {
     }
   })
 
-  it('renders the app title..', () => {
+  it('renders the app title', () => {
     render(<App />)
     expect(screen.getByText('DevOps Playground')).toBeInTheDocument()
   })

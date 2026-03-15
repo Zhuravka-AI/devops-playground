@@ -44,26 +44,28 @@ graph TD
         FE_App -->|Error Monitoring| Sentry
     end
 
-    %% Invisible link to force vertical layout
-    Architecture ~~~ CI_CD_Pipeline
+    Architecture ~~~ CI_CD
 
     %% CI/CD Flow
-    subgraph CI_CD_Pipeline
-        GH[GitHub Actions] -->|paths-filter| Filter{Detected Changes?}
+    subgraph CI_CD [CI/CD Workflow]
+        direction TB
+        GH[GitHub Actions CI] -->|Paths Filter| Filter_CI{Changes?}
         
-        Filter -->|backend/**| BE_Test[backend-test]
-        BE_Test --> BE_Sonar[SonarCloud Scan BE]
-        BE_Sonar --> BE_Push[Docker Hub Push BE]
-        BE_Push --> BE_Render[Render Deploy BE]
+        Filter_CI -->|backend| BE_Test[Backend Test & Sonar]
+        Filter_CI -->|frontend| FE_Test[Frontend Test & Sonar]
         
-        Filter -->|frontend/**| FE_Test[frontend-test]
-        FE_Test --> FE_Sonar[SonarCloud Scan FE]
-        FE_Sonar --> FE_Push[Docker Hub Push FE]
-        FE_Push --> FE_Render[Render Deploy FE]
+        BE_Test & FE_Test -->|Trigger: workflow_run| CD[GitHub Actions CD: Deploy to AWS]
+        
+        subgraph CD_Pipeline [CD Pipeline]
+            CD --> Build[Build & Push to DockerHub]
+            Build --> SCP[Copy Compose & Configs via SCP]
+            SCP --> SSH[Deploy via SSH: docker compose pull && up]
+        end
     end
 
-    style BE_Render fill:#f96,stroke:#333
-    style FE_Render fill:#f96,stroke:#333
+    style CD fill:#f96,stroke:#333
+    style Build fill:#f96,stroke:#333
+    style SSH fill:#f96,stroke:#333
     style Sentry fill:#6e40aa,color:#fff
 ```
 
