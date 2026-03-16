@@ -46,10 +46,10 @@ jobs:
       - name: Run Backend Tests
         run: |
           rm -f backend/coverage.xml
-          touch backend/coverage.xml
           docker run --rm \
-            -v $(pwd)/backend/coverage.xml:/app/coverage.xml \
-            backend-test:latest pytest --cov=app --cov-report=xml:/app/coverage.xml
+            -v $(pwd)/backend:/app \
+            -w /app \
+            backend-test:latest pytest --cov=app --cov-report=xml:coverage.xml
       - name: SonarCloud Scan (Backend)
         uses: SonarSource/sonarqube-scan-action@v7
         env:
@@ -57,6 +57,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
+            -Dsonar.projectBaseDir=.
             -Dsonar.sources=backend/app
             -Dsonar.python.coverage.reportPaths=backend/coverage.xml
 
