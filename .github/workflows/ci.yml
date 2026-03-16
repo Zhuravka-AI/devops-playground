@@ -62,9 +62,9 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-            -Dsonar.projectBaseDir=.
             -Dsonar.sources=backend/app
             -Dsonar.python.coverage.reportPaths=backend/coverage.xml
+            -Dsonar.projectBaseDir=.
 
   frontend-test:
     needs: changes
