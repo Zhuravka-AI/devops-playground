@@ -50,6 +50,9 @@ jobs:
             -v $(pwd)/backend:/backend \
             -w /backend \
             backend-test:latest pytest --cov=app --cov-report=xml:coverage.xml
+      - name: Fix coverage paths for SonarCloud
+        run: |
+          sed -i 's|<source>/backend/app</source>|<source>backend/app</source>|g' backend/coverage.xml
       - name: Upload coverage report artifact
         uses: actions/upload-artifact@v4
         with:
