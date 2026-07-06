@@ -14,6 +14,7 @@ jobs:
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
       frontend: ${{ steps.filter.outputs.frontend }}
+      e2e: ${{ steps.filter.outputs.e2e }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -22,6 +23,7 @@ jobs:
           filters: |
             backend: ['backend/**']
             frontend: ['frontend/**']
+            e2e: ['e2e/**']
 
   backend-test:
     needs: changes
@@ -60,7 +62,6 @@ jobs:
           path: backend/coverage.xml
       - name: SonarCloud Scan (Backend)
         uses: SonarSource/sonarqube-scan-action@v7
-        if: env.SONAR_TOKEN != '' # Only runs when the token is present
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -88,7 +89,6 @@ jobs:
         run: cd frontend && npm run coverage
       - name: SonarCloud Scan (Frontend)
         uses: SonarSource/sonarqube-scan-action@v7
-        if: env.SONAR_TOKEN != '' # Only runs when the token is present
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -96,3 +96,53 @@ jobs:
           args: >
             -Dsonar.sources=frontend/src
             -Dsonar.javascript.lcov.reportPaths=frontend/coverage/lcov.info
+
+  e2e-test:
+    needs: changes
+    if: ${{ needs.changes.outputs.frontend == 'true' || needs.changes.outputs.backend == 'true' || needs.changes.outputs.e2e == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: e2e/package.json
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Start Docker Compose Services
+        run: |
+          docker compose up -d --build
+
+      - name: Wait for services to be ready
+        run: |
+          echo "Waiting for backend API to be healthy..."
+          for i in {1..30}; do
+            if curl -s http://localhost/api/health | grep -q "ok"; then
+              echo "Application services are ready and online!"
+              break
+            fi
+            echo "Still loading... retrying in 2 seconds (Attempt $i/30)..."
+            sleep 2
+          done
+
+      - name: Install E2E Dependencies and Playwright
+        run: |
+          cd e2e
+          npm install
+          npx playwright install --with-deps
+
+      - name: Run Playwright Tests
+        env:
+          BASE_URL: http://localhost
+        run: |
+          cd e2e
+          npm test
+
+      - name: Stop Services
+        if: always()
+        run: docker compose down
