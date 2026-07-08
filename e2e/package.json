@@ -7,10 +7,10 @@
   "scripts": {
     "test": "playwright test",
     "test:ui": "playwright test --ui",
-    "test:report": "playwright show-report"
+    "test:report": "playwright show-report --host 0.0.0.0 --port 9323"
   },
   "devDependencies": {
-    "@playwright/test": "^1.49.0",
+    "@playwright/test": "1.61.1",
     "@types/node": "^20.0.0",
     "typescript": "^5.0.0"
   }

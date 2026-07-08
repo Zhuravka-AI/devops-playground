@@ -26,3 +26,16 @@ services:
     depends_on:
       - backend
       - frontend
+
+  e2e:
+    build:
+      context: ./e2e
+    image: ${DOCKERHUB_USERNAME:-devops-playground}/project-e2e:latest
+    profiles:
+      - test
+    ports:
+      - "9323:9323"
+    environment:
+      - BASE_URL=http://nginx:80
+    depends_on:
+      - nginx

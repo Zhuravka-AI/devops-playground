@@ -37,34 +37,46 @@ The suite provides comprehensive coverage to verify integration without over-com
 ## 🚀 How to Run Locally
 
 ### 1. Run via Docker Compose (Recommended)
-This mirrors exactly how the application runs in production and CI. It compiles the local changes and orchestrates services behind Nginx:
+This mirrors exactly how the application runs in production and CI. It builds your changes and orchestrates your services behind Nginx, running your tests in an isolated, containerized environment with pre-baked browser engines:
 ```bash
 # Start the backend, frontend, and nginx proxy
-docker compose up -d --build
+docker compose up -d --build backend frontend nginx
 
-# Install Playwright dependencies
-cd e2e
-npm install
-npx playwright install --with-deps
-
-# Run the test suite against the Docker container (default is http://localhost)
-npm test
+# Run the Playwright test suite inside its isolated Docker container
+docker compose --profile test run --rm e2e
 ```
+That's it! Docker handles everything, and there's no need to download or install browsers on your local machine.
 
-### 2. Run via Dev Servers (Hot reloading)
-If you are iteratively developing the frontend and backend locally:
-```bash
-# Run in the E2E folder, setting the BASE_URL to your local frontend port (usually http://localhost:5173)
-cd e2e
-npm install
-npx playwright install
+---
 
-# Run tests
-BASE_URL=http://localhost:5173 npm test
+## 🔍 Q&A: Ports, Networks, and Docker-Specifics
 
-# Open interactive UI mode (highly recommended for debugging!)
-BASE_URL=http://localhost:5173 npm run test:ui
+Here are clear answers to common questions regarding port mapping, networking inside Docker, and retrieving reports:
+
+### Q1: Where does port 5173 come from in `BASE_URL=http://localhost:5173`? Why does `localhost:80` work instead?
+* **Port 5173** is the default port used by **Vite** when you run a frontend development server locally (`npm run dev` directly within the `/frontend` directory).
+* When you run the full stack via **Docker Compose**, **Nginx** acts as the gateway/reverse proxy on port `80` (standard HTTP), routing all incoming frontend requests to the containerized frontend server and `/api/*` requests to the FastAPI backend. 
+* Therefore, when using the Docker orchestration, `http://localhost:80` (or simply `http://localhost`) is the correct entrypoint to test the unified app. Port `5173` is only relevant if you bypass Nginx and run the frontend dev server standalone.
+
+### Q2: Why does `BASE_URL=http://nginx:80` not work for `docker compose run --rm e2e` initially, but `localhost:80` doesn't either?
+Your browser launch crashed immediately with the error:
+```text
+Error: browserType.launch: Executable doesn't exist at /ms-playwright/chromium_headless_shell-1228/chrome-linux/headless_shell
+Looks like Playwright was just updated to 1.61.1. Please update docker image as well.
 ```
+* **The Root Cause:** In `e2e/package.json`, we previously defined Playwright with a caret `"^1.49.0"`. When building the docker image, npm resolved the caret to a newer patch release (e.g., `1.61.1`). Playwright then looked for browser binaries matching `1.61.1`. However, the base Docker image `mcr.microsoft.com/playwright:v1.49.0-noble` only comes pre-baked with browsers for `1.49.0`. This version mismatch caused the browser to fail to start entirely.
+* **The Fix:** We have **pinned** Playwright to exactly `"1.49.0"` in `e2e/package.json`. Now, the dependency matches the pre-baked browsers in the Docker container perfectly, and the browser will launch smoothly.
+* **Networking Context:** Once the browser starts successfully, `BASE_URL=http://nginx:80` (or `http://nginx`) is **exactly** what you need inside the docker network. Since the `e2e` container is running within the same Docker network, it cannot access the app via `localhost` (as `localhost` inside the container refers to the E2E container itself!). It must refer to the gateway service by its service name, which is `nginx`.
+
+### Q3: How do I view HTML reports served at `http://localhost:9323` inside the Docker container?
+By default, Docker containers are isolated. If Playwright starts a report server inside the container, you won't be able to access it from your browser on the host machine because the port is not forwarded.
+* **The Fix:** We have updated `e2e/package.json` to bind the report server to all network interfaces (`0.0.0.0` instead of `127.0.0.1`) and added port `9323:9323` to the `e2e` service in `docker-compose.yml`.
+* **To view reports, run:**
+  ```bash
+  # Start the report server inside the docker container, enabling service port mapping
+  docker compose --profile test run --service-ports --rm e2e npm run test:report
+  ```
+  Now, you can open **`http://localhost:9323`** in your host machine's web browser and view your test reports with full trace logs!
 
 ---
 
@@ -74,12 +86,12 @@ The test suite is fully integrated into the GitHub Actions CI pipeline (`.github
 
 Whenever a developer opens a Pull Request or pushes to `main`:
 1. It uses `paths-filter` to detect changes to `frontend/**`, `backend/**`, or `e2e/**`.
-2. It spins up a temporary Docker Compose cluster directly inside the runner runner (`ubuntu-latest`).
+2. It spins up a temporary Docker Compose cluster (`backend`, `frontend`, and `nginx`) inside the GitHub runner.
 3. It polls the backend API `/api/health` until it reports `ok`.
-4. It executes the entire Playwright suite in parallel across **Chromium**, **Firefox**, and **Webkit (Safari)**.
+4. It executes the entire Playwright suite container (`docker compose --profile test run --rm e2e`) in parallel across **Chromium**, **Firefox**, and **Webkit (Safari)**.
 5. It safely tears down Docker containers at the end.
 
-This acts as a solid quality gateway, preventing any broken client/server contracts from being merged to `main`.
+This acts as a solid quality gateway, preventing any broken client/server contracts from being merged to `main`, without having to install any browsers or node packages on the GitHub Action host.
 
 ---
 
@@ -87,17 +99,28 @@ This acts as a solid quality gateway, preventing any broken client/server contra
 
 One of the great advantages of an independent E2E directory is that it can run against **any** live deployment environment as a post-deploy healthcheck!
 
-In your `.github/workflows/deploy.yml` pipeline, you can run a final step right after your servers boot up:
+In your `.github/workflows/deploy.yml` pipeline, you can run the tests right inside their Docker container directly against your live staging/production servers:
 
 ```yaml
       - name: Run E2E Production Smoke Test
-        env:
-          BASE_URL: http://13.62.199.141 # Use your live environment URL or domain
         run: |
-          cd e2e
-          npm install
-          npx playwright install --with-deps
-          npm test
+          docker compose --profile test run \
+            -e BASE_URL=https://your-production-app.com \
+            --rm e2e
 ```
 
-If the smoke test fails (e.g., if a networking issue, database timeout, or configuration mismatch occurs), the deployment step will immediately fail and alert you, allowing for rapid rollbacks.
+If the smoke test fails (e.g., due to a routing issue, database timeout, or configuration mismatch), the deployment step will immediately fail and alert you, allowing for rapid rollbacks.
+
+### Also. Run via Dev Servers (Hot reloading)
+If you are iteratively developing the frontend and backend locally:
+```bash
+# Run in the E2E folder, setting the BASE_URL to your local frontend port (usually http://localhost:5173)
+cd e2e
+npm install
+npx playwright install
+
+# Run tests
+BASE_URL=http://localhost:80 npm test
+
+# Open interactive UI mode (highly recommended for debugging!)
+BASE_URL=http://localhost:80 npm run test:ui

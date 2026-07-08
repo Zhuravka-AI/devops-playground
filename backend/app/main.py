@@ -70,3 +70,5 @@ async def trigger_error():
     # sonar:off
     division_by_zero = 1 / 0
     # sonar:on
+    
+# test comment to trigger changes in the backend for CI/CD pipeline demonstration.

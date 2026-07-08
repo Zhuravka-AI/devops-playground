@@ -104,19 +104,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: e2e/package.json
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Start Docker Compose Services
         run: |
-          docker compose up -d --build
+          docker compose up -d --build backend frontend nginx
 
       - name: Wait for services to be ready
         run: |
@@ -130,18 +123,9 @@ jobs:
             sleep 2
           done
 
-      - name: Install E2E Dependencies and Playwright
+      - name: Run Playwright Tests inside Docker
         run: |
-          cd e2e
-          npm install
-          npx playwright install --with-deps
-
-      - name: Run Playwright Tests
-        env:
-          BASE_URL: http://localhost
-        run: |
-          cd e2e
-          npm test
+          docker compose --profile test run --rm e2e
 
       - name: Stop Services
         if: always()
