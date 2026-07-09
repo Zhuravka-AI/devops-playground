@@ -8,7 +8,7 @@ test.describe('DevOps Playground E2E Tests', () => {
     await expect(playgroundPage.analyzeButton).toBeDisabled(); // Should be disabled initially
   });
 
-  test('should analyze short text and return expected metrics', async ({ playgroundPage }) => {
+  test('should analyze short text and return expected metrics @smoke', async ({ playgroundPage }) => {
     const testText = 'Hello DevOps!';
     await playgroundPage.analyzeText(testText);
 

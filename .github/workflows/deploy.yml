@@ -112,7 +112,8 @@ jobs:
           docker compose --profile test run \
             -e BASE_URL=http://${{ secrets.SERVER_IP }} \
             --no-deps \
-            --rm e2e
+            --rm e2e \
+            npx playwright test --grep @smoke
 
       - name: Upload Playwright Test Report (Smoke Test)
         if: always()
