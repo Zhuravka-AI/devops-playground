@@ -39,11 +39,11 @@ The suite provides comprehensive coverage to verify integration without over-com
 ### 1. Run via Docker Compose (Recommended)
 This mirrors exactly how the application runs in production and CI. It builds your changes and orchestrates your services behind Nginx, running your tests in an isolated, containerized environment with pre-baked browser engines:
 ```bash
-# Start the backend, frontend, and nginx proxy
-docker compose up -d --build backend frontend nginx
+# Start the backend, frontend, and nginx proxy with the 'test' profile
+docker compose --profile test up -d --build backend frontend nginx
 
-# Run the Playwright test suite inside its isolated Docker container
-docker compose --profile test run --rm e2e
+# Run the Playwright test suite inside its isolated Docker container (avoiding recreation of dependencies)
+docker compose --profile test run --no-recreate --rm e2e
 ```
 That's it! Docker handles everything, and there's no need to download or install browsers on your local machine.
 
@@ -58,15 +58,10 @@ Here are clear answers to common questions regarding port mapping, networking in
 * When you run the full stack via **Docker Compose**, **Nginx** acts as the gateway/reverse proxy on port `80` (standard HTTP), routing all incoming frontend requests to the containerized frontend server and `/api/*` requests to the FastAPI backend. 
 * Therefore, when using the Docker orchestration, `http://localhost:80` (or simply `http://localhost`) is the correct entrypoint to test the unified app. Port `5173` is only relevant if you bypass Nginx and run the frontend dev server standalone.
 
-### Q2: Why does `BASE_URL=http://nginx:80` not work for `docker compose run --rm e2e` initially, but `localhost:80` doesn't either?
-Your browser launch crashed immediately with the error:
-```text
-Error: browserType.launch: Executable doesn't exist at /ms-playwright/chromium_headless_shell-1228/chrome-linux/headless_shell
-Looks like Playwright was just updated to 1.61.1. Please update docker image as well.
-```
-* **The Root Cause:** In `e2e/package.json`, we previously defined Playwright with a caret `"^1.49.0"`. When building the docker image, npm resolved the caret to a newer patch release (e.g., `1.61.1`). Playwright then looked for browser binaries matching `1.61.1`. However, the base Docker image `mcr.microsoft.com/playwright:v1.49.0-noble` only comes pre-baked with browsers for `1.49.0`. This version mismatch caused the browser to fail to start entirely.
-* **The Fix:** We have **pinned** Playwright to exactly `"1.49.0"` in `e2e/package.json`. Now, the dependency matches the pre-baked browsers in the Docker container perfectly, and the browser will launch smoothly.
-* **Networking Context:** Once the browser starts successfully, `BASE_URL=http://nginx:80` (or `http://nginx`) is **exactly** what you need inside the docker network. Since the `e2e` container is running within the same Docker network, it cannot access the app via `localhost` (as `localhost` inside the container refers to the E2E container itself!). It must refer to the gateway service by its service name, which is `nginx`.
+### Q2: Why did `BASE_URL=http://nginx:80` fail initially with element timeouts, but work locally?
+* **The Root Cause:** In `e2e/package.json`, we previously used a caret `^1.49.0` for Playwright, which auto-upgraded to `1.61.1` during npm build inside Docker. This mismatched the base Playwright image `mcr.microsoft.com/playwright:v1.49.0-noble`. We have upgraded both to **`1.61.1`** (`mcr.microsoft.com/playwright:v1.61.1-noble` and `"@playwright/test": "1.61.1"`) to guarantee absolute alignment.
+* **The DNS Caching behavior:** During our initial workflow, `docker compose up -d` was run first without any profile, and then `docker compose --profile test run e2e` was executed. Because the evaluation context changed, Docker Compose decided to *recreate* the `frontend` and `backend` containers. Recreated containers receive new IP addresses in the internal network. Because Nginx resolves upstreams *once* at startup, Nginx was caching the *old* IP addresses of `frontend` and `backend`! Playwright's navigations went through Nginx, which returned a 502 Bad Gateway page (which successfully loaded, but of course lacked any of our page elements).
+* **The Fix:** We aligned both steps to use the exact same profile (`--profile test up` and `--profile test run`) and supplied the `--no-recreate` flag. This prevents any recreation of dependent containers, keeping Nginx's upstream resolution completely intact and reliable.
 
 ### Q3: How do I view HTML reports served at `http://localhost:9323` inside the Docker container?
 By default, Docker containers are isolated. If Playwright starts a report server inside the container, you won't be able to access it from your browser on the host machine because the port is not forwarded.
@@ -86,12 +81,11 @@ The test suite is fully integrated into the GitHub Actions CI pipeline (`.github
 
 Whenever a developer opens a Pull Request or pushes to `main`:
 1. It uses `paths-filter` to detect changes to `frontend/**`, `backend/**`, or `e2e/**`.
-2. It spins up a temporary Docker Compose cluster (`backend`, `frontend`, and `nginx`) inside the GitHub runner.
+2. It spins up a temporary Docker Compose cluster (`backend`, `frontend`, and `nginx`) inside the GitHub runner using `--profile test`.
 3. It polls the backend API `/api/health` until it reports `ok`.
-4. It executes the entire Playwright suite container (`docker compose --profile test run --rm e2e`) in parallel across **Chromium**, **Firefox**, and **Webkit (Safari)**.
-5. It safely tears down Docker containers at the end.
-
-This acts as a solid quality gateway, preventing any broken client/server contracts from being merged to `main`, without having to install any browsers or node packages on the GitHub Action host.
+4. It executes the entire Playwright suite container (`docker compose --profile test run --no-recreate --rm e2e`) in parallel across **Chromium**, **Firefox**, and **Webkit (Safari)**.
+5. **Report Artifact Upload:** It automatically captures the `/app/playwright-report` output via volume mounts and uploads it as a workflow artifact named `playwright-report`.
+6. It safely tears down Docker containers at the end.
 
 ---
 
@@ -106,6 +100,7 @@ In your `.github/workflows/deploy.yml` pipeline, you can run the tests right ins
         run: |
           docker compose --profile test run \
             -e BASE_URL=https://your-production-app.com \
+            --no-recreate \
             --rm e2e
 ```
 

@@ -37,5 +37,8 @@ services:
       - "9323:9323"
     environment:
       - BASE_URL=http://nginx:80
+    volumes:
+      - ./e2e/playwright-report:/app/playwright-report
+      - ./e2e/test-results:/app/test-results
     depends_on:
       - nginx
