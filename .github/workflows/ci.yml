@@ -125,7 +125,7 @@ jobs:
 
       - name: Run Playwright Tests inside Docker
         run: |
-          docker compose --profile test run --rm e2e
+          docker compose --profile test run --no-deps --rm e2e
 
       - name: Upload Playwright Test Report
         if: always()
