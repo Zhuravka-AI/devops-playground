@@ -94,3 +94,30 @@ jobs:
             
             docker compose pull
             docker compose up -d
+
+      - name: Wait for AWS environment to be healthy
+        run: |
+          echo "Waiting for live AWS application to be ready..."
+          for i in {1..30}; do
+            if curl -s http://${{ secrets.SERVER_IP }}/api/health | grep -q "ok"; then
+              echo "Production application is online and ready for smoke tests!"
+              break
+            fi
+            echo "Waiting for app to respond... retrying in 2 seconds (Attempt $i/30)..."
+            sleep 2
+          done
+
+      - name: Run E2E Production Smoke Test
+        run: |
+          docker compose --profile test run \
+            -e BASE_URL=http://${{ secrets.SERVER_IP }} \
+            --no-deps \
+            --rm e2e
+
+      - name: Upload Playwright Test Report (Smoke Test)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-smoke-report
+          path: e2e/playwright-report/
+          retention-days: 30

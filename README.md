@@ -53,19 +53,26 @@ graph TD
         
         Filter_CI -->|backend| BE_Test[Backend Test & Sonar]
         Filter_CI -->|frontend| FE_Test[Frontend Test & Sonar]
+        Filter_CI -->|e2e| E2E_Test[E2E Tests - Playwright]
         
-        BE_Test & FE_Test -->|Trigger: workflow_run| CD[GitHub Actions CD: Deploy to AWS]
+        BE_Test -->|Requires Success| E2E_Test
+        FE_Test -->|Requires Success| E2E_Test
+        
+        E2E_Test -->|Trigger: workflow_run| CD[GitHub Actions CD: Deploy to AWS]
         
         subgraph CD_Pipeline [CD Pipeline]
             CD --> Build[Build & Push to DockerHub]
             Build --> SCP[Copy Compose & Configs via SCP]
             SCP --> SSH[Deploy via SSH: docker compose pull && up]
+            SSH --> AWS_Health[Wait for App Health]
+            AWS_Health --> AWS_E2E[Live E2E Smoke Test]
         end
     end
 
     style CD fill:#f96,stroke:#333
     style Build fill:#f96,stroke:#333
     style SSH fill:#f96,stroke:#333
+    style AWS_E2E fill:#f96,stroke:#333
     style Sentry fill:#6e40aa,color:#fff
 ```
 

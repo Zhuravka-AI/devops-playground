@@ -26,3 +26,19 @@ services:
     depends_on:
       - backend
       - frontend
+
+  e2e:
+    build:
+      context: ./e2e
+    image: ${DOCKERHUB_USERNAME:-devops-playground}/project-e2e:latest
+    profiles:
+      - test
+    ports:
+      - "9323:9323"
+    environment:
+      - BASE_URL=http://nginx:80
+    volumes:
+      - ./e2e/playwright-report:/app/playwright-report
+      - ./e2e/test-results:/app/test-results
+    depends_on:
+      - nginx
