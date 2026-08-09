@@ -115,5 +115,3 @@ function App() {
 }
 
 export default App
-
-// Test comment to trigger changes in the frontend for CI/CD pipeline demonstration.
